@@ -13,7 +13,6 @@ export const register = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       errorResponse(res, errors.array()[0]?.msg, HTTP_STATUS.BAD_REQUEST);
@@ -22,7 +21,6 @@ export const register = async (
 
     const { name, email, password, role } = req.body;
 
-    // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -32,10 +30,8 @@ export const register = async (
       return;
     }
 
-    // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         name,
@@ -52,7 +48,6 @@ export const register = async (
       },
     });
 
-    // Generate token
     const token = generateToken({
       id: user.id,
       email: user.email,
@@ -76,7 +71,6 @@ export const login = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       errorResponse(res, errors.array()[0]?.msg, HTTP_STATUS.BAD_REQUEST);
@@ -85,7 +79,6 @@ export const login = async (
 
     const { email, password } = req.body;
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -97,7 +90,6 @@ export const login = async (
       );
     }
 
-    // Compare password
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
@@ -107,7 +99,6 @@ export const login = async (
       );
     }
 
-    // Generate token
     const token = generateToken({
       id: user.id,
       email: user.email,

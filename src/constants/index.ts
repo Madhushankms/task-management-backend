@@ -42,4 +42,7 @@ export const MESSAGES = {
   FORBIDDEN: "You do not have permission",
   // Server
   SERVER_ERROR: "Internal server error",
+
+  USER_NOT_FOUND: "User not found",
+  USER_DELETED: "User deleted successfully",
 } as const;

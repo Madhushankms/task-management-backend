@@ -56,15 +56,15 @@ export const getAllTasks = async (
   try {
     const { search, priority, status } = req.query;
     const isAdmin = req.user?.role === ROLES.ADMIN;
-
+    const searchText = typeof search === "string" ? search : undefined;
     const tasks = await prisma.task.findMany({
       where: {
         ...(!isAdmin && {
           OR: [{ createdById: req.user?.id }, { assignedToId: req.user?.id }],
         }),
 
-        ...(search && {
-          title: { contains: String(search) },
+        ...(searchText && {
+          title: { contains: String(searchText) },
         }),
 
         ...(priority && { priority: priority as never }),

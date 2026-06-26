@@ -2,10 +2,11 @@ import express, { Application } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
-import { errorHandler } from "./middleware/error.middleware";
-import routes from "./routes";
-import { swaggerSpec } from "./config/swagger";
 import swaggerUi from "swagger-ui-express";
+import { ENV } from "./config/env";
+import { errorHandler } from "./middleware/error.middleware";
+import { swaggerSpec } from "./config/swagger";
+import routes from "./routes";
 
 const app: Application = express();
 
@@ -17,21 +18,22 @@ app.use(
 
 app.use(
   cors({
-    // origin: process.env.FRONTEND_URL || "http://localhost:5173",
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: false,
   }),
 );
 
-app.use(morgan("dev"));
+app.use(morgan(ENV.NODE_ENV === "production" ? "combined" : "dev"));
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use("/api", routes);
+
 app.use(errorHandler);
 
 export default app;
